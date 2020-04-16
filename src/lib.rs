@@ -44,15 +44,15 @@ use std::io::Read;
 // Again, no way to resolve the lifespan of &str from this.
 
 pub struct Board {
-    _vals: [u8; 81],
-    _start_pos: HashSet<u8>,
+    _grid: [u8; 81],
+    _clues_indices: HashSet<u8>,
 }
 
 impl Board {
     fn _init() -> Board {
         Board {
-            _vals: [0; 81],
-            _start_pos: HashSet::new(),
+            _grid: [0; 81],
+            _clues_indices: HashSet::new(),
         }
     }
 
@@ -60,13 +60,13 @@ impl Board {
     fn _check_row_col(&self, m: &Move) -> bool {
         for i in 0..9 {
             // check row
-            let row_val = self._vals[((m.row) * 9 + i) as usize];
+            let row_val = self._grid[((m.row) * 9 + i) as usize];
             if row_val == m.value {
                 // if the new value is same as old value, its ok ...
                 return m.column == i;
             }
             // check column
-            let col_val = self._vals[((i * 9) + m.column) as usize];
+            let col_val = self._grid[((i * 9) + m.column) as usize];
             if col_val == m.value {
                 return m.row == i;
             }
@@ -86,13 +86,13 @@ impl Board {
                 let col_idx = start_col + j;
                 let idx = row_offset + col_idx;
 
-                if self._vals[idx as usize] == m.value {
+                if self._grid[idx as usize] == m.value {
                     println!(
                         "value already exists at x: {}, y: {}, value: {},exising: {}",
                         i,
                         j,
                         m.value,
-                        self._vals[(i + j) as usize]
+                        self._grid[(i + j) as usize]
                     );
                     return false;
                 }
@@ -105,9 +105,9 @@ impl Board {
         (m.row * 9) + m.column
     }
 
-    fn set_value(&mut self, m: &Move) -> Result<(), &str> {
+    fn update_cell(&mut self, m: &Move) -> Result<(), &str> {
         let idx = Board::_get_index_value(m);
-        if self._start_pos.contains(&idx) {
+        if self._clues_indices.contains(&idx) {
             return Err("cannot update initial board value");
         }
 
@@ -119,9 +119,9 @@ impl Board {
         }
         println!(
             "move: row:{}, column:{}, new value: {}, previous value:{}",
-            m.row, m.column, m.value, self._vals[idx as usize]
+            m.row, m.column, m.value, self._grid[idx as usize]
         );
-        self._vals[idx as usize] = m.value;
+        self._grid[idx as usize] = m.value;
         Ok(())
     }
 
@@ -150,8 +150,8 @@ impl Board {
         assert_eq!(count, 81);
 
         Ok(Board {
-            _vals: v_arr,
-            _start_pos: spots,
+            _grid: v_arr,
+            _clues_indices: spots,
         })
     }
 
@@ -165,7 +165,7 @@ impl Board {
                 if j % 3 == 0 {
                     print!("| ");
                 }
-                let v = self._vals[(i * 9) + j];
+                let v = self._grid[(i * 9) + j];
                 if v == 0 {
                     print!(". ");
                 } else {
@@ -179,7 +179,7 @@ impl Board {
 
     fn check_if_finished(&self) -> bool {
         for i in 0..81 {
-            if self._vals[i] == 0 {
+            if self._grid[i] == 0 {
                 return false;
             }
         }
@@ -204,7 +204,7 @@ pub fn play(board: &mut Board) {
 
         let m = Move::new(next_move[0], next_move[1], next_move[2]).unwrap();
 
-        match board.set_value(&m) {
+        match board.update_cell(&m) {
             Ok(_) => (),
             Err(msg) => println!(
                 "unable to make move row:{}, col:{}, new value:{} -> {} ",
