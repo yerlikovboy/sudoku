@@ -87,6 +87,7 @@ impl Board {
                 let idx = row_offset + col_idx;
 
                 if self._grid[idx as usize] == m.value {
+                    /*
                     println!(
                         "value already exists at x: {}, y: {}, value: {},exising: {}",
                         i,
@@ -94,6 +95,7 @@ impl Board {
                         m.value,
                         self._grid[(i + j) as usize]
                     );
+                    */
                     return false;
                 }
             }
