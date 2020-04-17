@@ -43,6 +43,7 @@ use std::io::Read;
 // }
 // Again, no way to resolve the lifespan of &str from this.
 
+// classic 9x9 sudoku
 pub struct Board {
     _grid: [u8; 81],
     _clues_indices: HashSet<u8>,
@@ -56,6 +57,10 @@ impl Board {
         }
     }
 
+    pub fn grid(&self) -> Vec<u8> {
+        let v: Vec<u8> = self._grid.iter().map(|x| *x).collect();
+        v
+    }
     // return true if ok to insert, false otherwise.
     fn _check_row_col(&self, m: &Move) -> bool {
         for i in 0..9 {
@@ -181,7 +186,7 @@ impl Board {
         println!("-------------------------");
     }
 
-    fn check_if_finished(&self) -> bool {
+    pub fn is_completed(&self) -> bool {
         for i in 0..81 {
             if self._grid[i] == 0 {
                 return false;
@@ -191,9 +196,9 @@ impl Board {
     }
 }
 
-pub fn play(board: &mut Board) {
+pub fn play(puzzle: &mut Board) {
     loop {
-        board.print_console();
+        puzzle.print_console();
         println!("Please enter your next move (row column value) or Ctrl-C to quit: ");
 
         let mut raw_input = String::new();
@@ -208,14 +213,14 @@ pub fn play(board: &mut Board) {
 
         let m = Move::new(next_move[0], next_move[1], next_move[2]).unwrap();
 
-        match board.update_cell(&m) {
+        match puzzle.update_cell(&m) {
             Ok(_) => (),
             Err(msg) => println!(
                 "unable to make move row:{}, col:{}, new value:{} -> {} ",
                 next_move[0], next_move[1], next_move[2], msg
             ),
         }
-        if board.check_if_finished() {
+        if puzzle.is_completed() {
             println!("Congrats! You've won!");
             break;
         }
