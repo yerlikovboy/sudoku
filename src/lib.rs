@@ -119,10 +119,12 @@ impl Board {
         if self._check_box(m) == false {
             return Err("value already exists in box");
         }
+        /*
         println!(
             "move: row:{}, column:{}, new value: {}, previous value:{}",
             m.row, m.column, m.value, self._grid[idx as usize]
         );
+        */
         self._grid[idx as usize] = m.value;
         Ok(())
     }
