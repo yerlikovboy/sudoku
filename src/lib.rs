@@ -49,7 +49,7 @@ pub struct Board {
 }
 
 impl Board {
-    fn _init() -> Board {
+    pub fn init() -> Board {
         Board {
             _grid: [0; 81],
             _clues_indices: HashSet::new(),
@@ -105,7 +105,7 @@ impl Board {
         (m.row * 9) + m.column
     }
 
-    fn update_cell(&mut self, m: &Move) -> Result<(), &str> {
+    pub fn update_cell(&mut self, m: &Move) -> Result<(), &str> {
         let idx = Board::_get_index_value(m);
         if self._clues_indices.contains(&idx) {
             return Err("cannot update initial board value");
@@ -155,7 +155,7 @@ impl Board {
         })
     }
 
-    fn print_console(&self) {
+    pub fn print_console(&self) {
         println!("Board");
         for i in 0..9 {
             if i % 3 == 0 {
@@ -218,14 +218,14 @@ pub fn play(board: &mut Board) {
     }
 }
 
-struct Move {
+pub struct Move {
     row: u8,
     column: u8,
     value: u8,
 }
 
 impl Move {
-    fn new(row: u8, column: u8, value: u8) -> Result<Move, String> {
+    pub fn new(row: u8, column: u8, value: u8) -> Result<Move, String> {
         if row < 1 || row > 9 {
             return Err(String::from("row must be in the range 1..9"));
         }
