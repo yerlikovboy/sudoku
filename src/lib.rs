@@ -3,7 +3,7 @@ use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::Read;
-
+use std::str;
 // lessons learned:
 //
 // numeric values have to be converted to usize if they are to be used
@@ -213,9 +213,8 @@ pub fn play(puzzle: &mut Board) {
 
         let m = Cell::new(next_move[0], next_move[1], next_move[2]).unwrap();
 
-        println!("Requested move: {}", m);
         match puzzle.update_cell(&m) {
-            Ok(_) => (),
+            Ok(update) => println!("update: {}", update),
             Err(msg) => println!(
                 "unable to make move row:{}, col:{}, new value:{} -> {} ",
                 next_move[0], next_move[1], next_move[2], msg
@@ -259,10 +258,11 @@ impl Cell {
 
 impl fmt::Display for Cell {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let previous_value = match self.previous_value {
-            Some(_) => stringify!(v),
-            None => "none",
-        };
+        //let previous_value = self.previous_value.unwrap_or(0);
+        let previous_value = self
+            .previous_value
+            .map_or(String::from("none"), |x| x.to_string());
+
         formatter.write_fmt(format_args!(
             "cell: [ row: {}, column: {}, value: {}, previous_value: {}]",
             self.row, self.column, self.value, previous_value
