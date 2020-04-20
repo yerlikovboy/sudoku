@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::Read;
@@ -212,6 +213,7 @@ pub fn play(puzzle: &mut Board) {
 
         let m = Cell::new(next_move[0], next_move[1], next_move[2]).unwrap();
 
+        println!("Requested move: {}", m);
         match puzzle.update_cell(&m) {
             Ok(_) => (),
             Err(msg) => println!(
@@ -252,5 +254,18 @@ impl Cell {
             value: value,
             previous_value: Option::None,
         })
+    }
+}
+
+impl fmt::Display for Cell {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        let previous_value = match self.previous_value {
+            Some(_) => stringify!(v),
+            None => "none",
+        };
+        formatter.write_fmt(format_args!(
+            "cell: [ row: {}, column: {}, value: {}, previous_value: {}]",
+            self.row, self.column, self.value, previous_value
+        ))
     }
 }
