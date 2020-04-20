@@ -62,7 +62,7 @@ impl Board {
         v
     }
     // return true if ok to insert, false otherwise.
-    fn _check_row_col(&self, m: &Move) -> bool {
+    fn _check_row_col(&self, m: &Cell) -> bool {
         for i in 0..9 {
             // check row
             let row_val = self._grid[((m.row) * 9 + i) as usize];
@@ -79,7 +79,7 @@ impl Board {
         true
     }
 
-    fn _check_box(&self, m: &Move) -> bool {
+    fn _check_box(&self, m: &Cell) -> bool {
         // find the closest multiple of three
         // less than or equal to x
         let start_offset = (m.row / 3) * 3;
@@ -108,11 +108,11 @@ impl Board {
         true
     }
 
-    fn _get_index_value(m: &Move) -> u8 {
+    fn _get_index_value(m: &Cell) -> u8 {
         (m.row * 9) + m.column
     }
 
-    pub fn update_cell(&mut self, m: &Move) -> Result<(), &str> {
+    pub fn update_cell(&mut self, m: &Cell) -> Result<Cell, &str> {
         let idx = Board::_get_index_value(m);
         if self._clues_indices.contains(&idx) {
             return Err("cannot update initial board value");
@@ -124,14 +124,13 @@ impl Board {
         if self._check_box(m) == false {
             return Err("value already exists in box");
         }
-        /*
-        println!(
-            "move: row:{}, column:{}, new value: {}, previous value:{}",
-            m.row, m.column, m.value, self._grid[idx as usize]
-        );
-        */
+
+        let updated_cell = Cell {
+            previous_value: Some(self._grid[idx as usize]),
+            ..*m
+        };
         self._grid[idx as usize] = m.value;
-        Ok(())
+        Ok(updated_cell)
     }
 
     pub fn load_from_file(file_name: &str) -> std::io::Result<Board> {
@@ -211,7 +210,7 @@ pub fn play(puzzle: &mut Board) {
             .map(|x| x.parse::<u8>().unwrap())
             .collect();
 
-        let m = Move::new(next_move[0], next_move[1], next_move[2]).unwrap();
+        let m = Cell::new(next_move[0], next_move[1], next_move[2]).unwrap();
 
         match puzzle.update_cell(&m) {
             Ok(_) => (),
@@ -227,14 +226,15 @@ pub fn play(puzzle: &mut Board) {
     }
 }
 
-pub struct Move {
+pub struct Cell {
     row: u8,
     column: u8,
     value: u8,
+    previous_value: Option<u8>,
 }
 
-impl Move {
-    pub fn new(row: u8, column: u8, value: u8) -> Result<Move, String> {
+impl Cell {
+    pub fn new(row: u8, column: u8, value: u8) -> Result<Cell, String> {
         if row < 1 || row > 9 {
             return Err(String::from("row must be in the range 1..9"));
         }
@@ -246,10 +246,11 @@ impl Move {
             return Err(String::from("new value must be between 0 and 9"));
         }
 
-        Ok(Move {
+        Ok(Cell {
             row: row - 1,
             column: column - 1,
             value: value,
+            previous_value: Option::None,
         })
     }
 }
