@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 use std::fmt;
 use std::fs::File;
-use std::io;
 use std::io::Read;
 use std::str;
 // lessons learned:
@@ -193,37 +192,6 @@ impl Board {
             }
         }
         true
-    }
-}
-
-pub fn play(puzzle: &mut Board) {
-    loop {
-        puzzle.print_console();
-        println!("Please enter your next move (row column value) or Ctrl-C to quit: ");
-
-        let mut raw_input = String::new();
-        io::stdin()
-            .read_line(&mut raw_input)
-            .expect("error reading input from user");
-
-        let next_move: Vec<u8> = raw_input
-            .split_whitespace()
-            .map(|x| x.parse::<u8>().unwrap())
-            .collect();
-
-        let m = Cell::new(next_move[0], next_move[1], next_move[2]).unwrap();
-
-        match puzzle.update_cell(&m) {
-            Ok(update) => println!("update: {}", update),
-            Err(msg) => println!(
-                "unable to make move row:{}, col:{}, new value:{} -> {} ",
-                next_move[0], next_move[1], next_move[2], msg
-            ),
-        }
-        if puzzle.is_completed() {
-            println!("Congrats! You've won!");
-            break;
-        }
     }
 }
 
