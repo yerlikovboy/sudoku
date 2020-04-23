@@ -1,11 +1,11 @@
-use std::env;
-use sudoku::Board;
-
 use std::char;
+use std::env;
 use std::fmt;
 use std::fmt::Display;
 use std::io;
 use std::io::Read;
+
+use sudoku::Board;
 use sudoku::Cell;
 
 const LINE_FEED: u8 = 10;
