@@ -1,6 +1,4 @@
 use std::collections::HashSet;
-use std::fs::File;
-use std::io::Read;
 use std::str;
 
 use crate::Cell;
@@ -46,19 +44,14 @@ use crate::Cell;
 // Again, no way to resolve the lifespan of &str from this.
 
 // classic 9x9 sudoku
-pub struct Board {
+pub struct Puzzle {
     _grid: Vec<u8>,
     _clues_indices: HashSet<u8>,
 }
 
-impl Board {
-    //TODO: remove this
-    pub fn init() -> Board {
-        Board::initialize(vec![0; 81].as_slice())
-    }
-
-    pub fn initialize(grid: &[u8]) -> Board {
-        Board {
+impl Puzzle {
+    pub fn new(grid: &[u8]) -> Puzzle {
+        Puzzle {
             _grid: grid.to_vec(),
             _clues_indices: (0..81)
                 .filter(|x| grid[*x as usize] != 0)
@@ -66,25 +59,8 @@ impl Board {
         }
     }
 
-    //TODO: refactor this to accept the grid (maybe a struct with grid id, etc) instead of
-    // a file
-    pub fn from_file(file_name: &str) -> std::io::Result<Board> {
-        let file = File::open(file_name)?;
-
-        let grid = file
-            .bytes()
-            .map(|x| x.unwrap())
-            .filter(|x| x.is_ascii_digit())
-            .map(|x| x - 48)
-            .collect::<Vec<u8>>();
-
-        assert_eq!(grid.len(), 81);
-        Ok(Board::initialize(grid.as_slice()))
-    }
-
-    pub fn grid(&self) -> Vec<u8> {
-        let v: Vec<u8> = self._grid.iter().map(|x| *x).collect();
-        v
+    pub fn grid_as_ref(&self) -> &[u8] {
+        &self._grid
     }
 
     // return true if ok to insert, false otherwise.
@@ -130,7 +106,7 @@ impl Board {
     }
 
     pub fn update_cell(&mut self, m: &Cell) -> Result<Cell, &str> {
-        let idx = Board::_get_index_value(m);
+        let idx = Puzzle::_get_index_value(m);
         if self._clues_indices.contains(&idx) {
             return Err("cannot update initial board value");
         }
@@ -151,7 +127,7 @@ impl Board {
     }
 
     pub fn print_console(&self) {
-        println!("Board");
+        println!("Puzzle");
         for i in 0..9 {
             if i % 3 == 0 {
                 println!("-------------------------");
