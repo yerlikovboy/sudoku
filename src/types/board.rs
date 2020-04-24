@@ -47,16 +47,39 @@ use crate::Cell;
 
 // classic 9x9 sudoku
 pub struct Board {
-    _grid: [u8; 81],
+    _grid: Vec<u8>,
     _clues_indices: HashSet<u8>,
 }
 
 impl Board {
+    //TODO: remove this
     pub fn init() -> Board {
+        Board::initialize(vec![0; 81].as_slice())
+    }
+
+    pub fn initialize(grid: &[u8]) -> Board {
         Board {
-            _grid: [0; 81],
-            _clues_indices: HashSet::new(),
+            _grid: grid.to_vec(),
+            _clues_indices: (0..81)
+                .filter(|x| grid[*x as usize] != 0)
+                .collect::<HashSet<u8>>(),
         }
+    }
+
+    //TODO: refactor this to accept the grid (maybe a struct with grid id, etc) instead of
+    // a file
+    pub fn from_file(file_name: &str) -> std::io::Result<Board> {
+        let file = File::open(file_name)?;
+
+        let grid = file
+            .bytes()
+            .map(|x| x.unwrap())
+            .filter(|x| x.is_ascii_digit())
+            .map(|x| x - 48)
+            .collect::<Vec<u8>>();
+
+        assert_eq!(grid.len(), 81);
+        Ok(Board::initialize(grid.as_slice()))
     }
 
     pub fn grid(&self) -> Vec<u8> {
@@ -125,36 +148,6 @@ impl Board {
         };
         self._grid[idx as usize] = m.value;
         Ok(updated_cell)
-    }
-
-    pub fn load_from_file(file_name: &str) -> std::io::Result<Board> {
-        let zero = b'0';
-
-        let file = File::open(file_name)?;
-
-        let mut count: u8 = 0;
-        let mut v_arr: [u8; 81] = [0; 81];
-        let mut spots: HashSet<u8> = HashSet::new();
-
-        for curr_byte in file.bytes() {
-            let v = curr_byte.unwrap();
-            // skip spaces ...
-            if v.is_ascii_digit() {
-                v_arr[count as usize] = v - 48;
-                // if the value is not a zero, mark the location as init values
-                if v != zero {
-                    spots.insert(count);
-                }
-                count = count + 1;
-            }
-        }
-        // make sure we read in 81 values
-        assert_eq!(count, 81);
-
-        Ok(Board {
-            _grid: v_arr,
-            _clues_indices: spots,
-        })
     }
 
     pub fn print_console(&self) {
