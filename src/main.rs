@@ -153,7 +153,7 @@ fn main() {
         return;
     }
     let file_name = &args[1];
-    let mut board = Board::load_from_file(file_name).unwrap();
+    let mut board = Board::from_file(file_name).unwrap();
     play(&mut board);
     println!("Finished!");
 }
