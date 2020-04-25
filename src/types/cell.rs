@@ -44,7 +44,7 @@ impl Cell {
 
     pub fn peers(&self) -> Vec<usize> {
         println!("peers of {}", self);
-        let i: usize = (self.row as usize * 9) + self.column as usize;
+        let i: usize = self.to_grid_idx();
         let row_idx: usize = (i / 9) * 9;
         let row_end: usize = row_idx + 9;
         let rows: HashSet<usize> = (row_idx..row_end).filter(|x| *x != i).collect();
