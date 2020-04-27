@@ -63,49 +63,15 @@ impl Puzzle {
         &self._grid
     }
 
-    /*
-    // return true if ok to insert, false otherwise.
-    fn _check_row_col(&self, m: &Cell) -> bool {
-        for i in 0..9 {
-            // check row
-            let row_val = self._grid[((m.row) * 9 + i) as usize];
-            if row_val == m.value {
-                // if the new value is same as old value, its ok ...
-                return m.column == i;
-            }
-            // check column
-            let col_val = self._grid[((i * 9) + m.column) as usize];
-            if col_val == m.value {
-                return m.row == i;
-            }
-        }
-        true
-    }
-
-    fn _check_box(&self, m: &Cell) -> bool {
-        // find the closest multiple of three
-        // less than or equal to x
-        let start_offset = (m.row / 3) * 3;
-        let start_col = (m.column / 3) * 3;
-
-        for i in 0..3 {
-            let row_offset = (start_offset + i) * 9;
-            for j in 0..3 {
-                let col_idx = start_col + j;
-                let idx = row_offset + col_idx;
-
-                if self._grid[idx as usize] == m.value {
-                    return false;
+    fn check_peers(&self, c: &Cell) -> bool {
+        if !c.value.is_none() {
+            for idx in c.peers() {
+                if self._grid[idx] == c.value.unwrap() {
+                    return true;
                 }
             }
         }
-        true
-    }
-    */
-
-    pub fn check_peers(&self, c: &Cell) -> bool {
-        c.peers();
-        true
+        false
     }
 
     pub fn block_for_cell(&self, c: &Cell) -> Vec<u8> {

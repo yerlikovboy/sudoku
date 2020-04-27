@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::fmt;
 
 #[derive(Default)]
@@ -43,25 +42,43 @@ impl Cell {
     }
 
     pub fn peers(&self) -> Vec<usize> {
-        println!("peers of {}", self);
-        let i: usize = self.to_grid_idx();
-        let row_idx: usize = (i / 9) * 9;
+        let _self_idx = self.to_grid_idx();
+        let mut _mapper: [bool; 81] = [false; 81];
+
+        //rows
+        let row_idx: usize = (_self_idx / 9) * 9;
         let row_end: usize = row_idx + 9;
-        let rows: HashSet<usize> = (row_idx..row_end).filter(|x| *x != i).collect();
-        let col_offset: usize = i % 9;
-        let col: HashSet<usize> = (0..9)
-            .map(|x| (x * 9) + col_offset)
-            .filter(|x| *x != i)
-            .collect();
+        (row_idx..row_end)
+            .filter(|x| *x != _self_idx)
+            .for_each(|x| _mapper[x] = true);
 
-        let s: HashSet<usize> = rows.union(&col).cloned().collect();
+        // cols
+        let col_offset: usize = _self_idx % 9;
+        (0..9)
+            .map(|x| (x as usize * 9) + col_offset)
+            .filter(|x| *x != _self_idx)
+            .for_each(|x| _mapper[x] = true);
 
-        println!(
-            "i: {}, \nrow_range: {}..{}, \n\trows: {:?},\ncol_offset:{}, \n\tcol_idx:{:?}",
-            i, row_idx, row_end, rows, col_offset, col
-        );
+        // block
+        let block_x: usize = (self.row as usize / 3) * 3;
+        let block_y: usize = (self.column as usize / 3) * 3;
+        for i in 0..3 {
+            let row_offset = (block_x + i) * 9;
+            for j in 0..3 {
+                let col_idx = block_y + j;
+                let idx = row_offset + col_idx;
+                if _self_idx != idx {
+                    _mapper[idx] = true;
+                }
+            }
+        }
 
-        s.iter().cloned().collect()
+        // TODO: since there is always exactly 20 peers,
+        // there is no need to go through all 81 cells unless
+        // one of the peers is the last cell.
+        (0..81)
+            .filter(|x| _mapper[*x as usize] == true)
+            .collect::<Vec<usize>>()
     }
 }
 
