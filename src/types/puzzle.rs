@@ -63,42 +63,35 @@ impl Puzzle {
         &self._grid
     }
 
-    // return true if ok to insert, false otherwise.
-    fn _check_row_col(&self, m: &Cell) -> bool {
-        for i in 0..9 {
-            // check row
-            let row_val = self._grid[((m.row) * 9 + i) as usize];
-            if row_val == m.value {
-                // if the new value is same as old value, its ok ...
-                return m.column == i;
-            }
-            // check column
-            let col_val = self._grid[((i * 9) + m.column) as usize];
-            if col_val == m.value {
-                return m.row == i;
+    fn check_peers(&self, c: &Cell) -> bool {
+        if !c.value.is_none() {
+            for idx in c.peers() {
+                if self._grid[idx] == c.value.unwrap() {
+                    return true;
+                }
             }
         }
-        true
+        false
     }
 
-    fn _check_box(&self, m: &Cell) -> bool {
-        // find the closest multiple of three
-        // less than or equal to x
-        let start_offset = (m.row / 3) * 3;
-        let start_col = (m.column / 3) * 3;
+    pub fn block_for_cell(&self, c: &Cell) -> Vec<u8> {
+        let mut v: Vec<u8> = Vec::with_capacity(9);
+
+        let start_offset = (c.row / 3) * 3;
+        let start_col = (c.column / 3) * 3;
 
         for i in 0..3 {
             let row_offset = (start_offset + i) * 9;
             for j in 0..3 {
                 let col_idx = start_col + j;
                 let idx = row_offset + col_idx;
-
-                if self._grid[idx as usize] == m.value {
-                    return false;
+                let val = self._grid[idx as usize];
+                if val != 0 {
+                    v.push(val);
                 }
             }
         }
-        true
+        v
     }
 
     fn _get_index_value(m: &Cell) -> u8 {
@@ -111,18 +104,24 @@ impl Puzzle {
             return Err("cannot update initial board value");
         }
 
+        if self.check_peers(m) {
+            return Err("cell has a peer which already contains value");
+        }
+
+        /*
         if self._check_row_col(m) == false {
             return Err("row/column already has value");
         }
         if self._check_box(m) == false {
             return Err("value already exists in box");
         }
+        */
 
         let updated_cell = Cell {
             previous_value: Some(self._grid[idx as usize]),
             ..*m
         };
-        self._grid[idx as usize] = m.value;
+        self._grid[idx as usize] = m.value.unwrap_or(0);
         Ok(updated_cell)
     }
 

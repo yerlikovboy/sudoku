@@ -25,6 +25,7 @@ pub fn print_console(p: &Puzzle) {
     }
     println!("-------------------------");
 }
+
 pub fn from_file(file_name: &str) -> std::io::Result<Puzzle> {
     let file = File::open(file_name)?;
 

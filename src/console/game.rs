@@ -110,7 +110,9 @@ fn get_request() -> UserRequest {
                         }
                     };
                     if vals.len() == 3 {
-                        return UserRequest::Move(Cell::new(vals[0], vals[1], vals[2]).unwrap());
+                        return UserRequest::Move(
+                            Cell::new(vals[0], vals[1], Some(vals[2])).unwrap(),
+                        );
                     }
                     prev = ByteType::DIGIT;
                 }
