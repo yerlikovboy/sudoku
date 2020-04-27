@@ -60,6 +60,25 @@ impl Cell {
             .filter(|x| _mapper[*x as usize] == true)
             .collect::<Vec<usize>>()
     }
+
+    pub fn block_idx(&self) -> Vec<usize> {
+        let mut r: Vec<usize> = Vec::with_capacity(8);
+
+        let _self_idx = self.to_grid_idx();
+        let block_x: usize = (self.row as usize / 3) * 3;
+        let block_y: usize = (self.column as usize / 3) * 3;
+        for i in 0..3 {
+            let row_offset = (block_x + i) * 9;
+            for j in 0..3 {
+                let col_idx = block_y + j;
+                let idx = row_offset + col_idx;
+                if _self_idx != idx {
+                    r.push(idx);
+                }
+            }
+        }
+        r
+    }
 }
 
 impl fmt::Display for Cell {
