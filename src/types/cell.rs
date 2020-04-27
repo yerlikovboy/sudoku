@@ -15,7 +15,7 @@ impl Cell {
 
     pub fn from_grid_idx(idx: usize) -> Cell {
         Cell {
-            row: (idx as u8 / 9) * 9,
+            row: idx as u8 / 9,
             column: idx as u8 % 9,
             ..Default::default()
         }
