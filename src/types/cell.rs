@@ -9,26 +9,6 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(row: u8, column: u8, value: Option<u8>) -> Result<Cell, String> {
-        if row < 1 || row > 9 {
-            return Err(String::from("row must be in the range 1..9"));
-        }
-
-        if column < 1 || column > 9 {
-            return Err(String::from("column must be in the range 1..9"));
-        }
-        if value.unwrap_or(0) > 9 {
-            return Err(String::from("new value must be between 0 and 9"));
-        }
-
-        Ok(Cell {
-            row: row - 1,
-            column: column - 1,
-            value: value,
-            previous_value: Option::None,
-        })
-    }
-
     pub fn to_grid_idx(&self) -> usize {
         (self.row as usize * 9) + self.column as usize
     }

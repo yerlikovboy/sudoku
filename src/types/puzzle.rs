@@ -46,7 +46,7 @@ use crate::Cell;
 // classic 9x9 sudoku
 pub struct Puzzle {
     _grid: Vec<u8>,
-    _clues_indices: HashSet<u8>,
+    _clues_indices: HashSet<usize>,
 }
 
 impl Puzzle {
@@ -55,7 +55,7 @@ impl Puzzle {
             _grid: grid.to_vec(),
             _clues_indices: (0..81)
                 .filter(|x| grid[*x as usize] != 0)
-                .collect::<HashSet<u8>>(),
+                .collect::<HashSet<usize>>(),
         }
     }
 
@@ -74,32 +74,8 @@ impl Puzzle {
         false
     }
 
-    pub fn block_for_cell(&self, c: &Cell) -> Vec<u8> {
-        let mut v: Vec<u8> = Vec::with_capacity(9);
-
-        let start_offset = (c.row / 3) * 3;
-        let start_col = (c.column / 3) * 3;
-
-        for i in 0..3 {
-            let row_offset = (start_offset + i) * 9;
-            for j in 0..3 {
-                let col_idx = start_col + j;
-                let idx = row_offset + col_idx;
-                let val = self._grid[idx as usize];
-                if val != 0 {
-                    v.push(val);
-                }
-            }
-        }
-        v
-    }
-
-    fn _get_index_value(m: &Cell) -> u8 {
-        (m.row * 9) + m.column
-    }
-
     pub fn update_cell(&mut self, m: &Cell) -> Result<Cell, &str> {
-        let idx = Puzzle::_get_index_value(m);
+        let idx = m.to_grid_idx();
         if self._clues_indices.contains(&idx) {
             return Err("cannot update initial board value");
         }
@@ -108,43 +84,12 @@ impl Puzzle {
             return Err("cell has a peer which already contains value");
         }
 
-        /*
-        if self._check_row_col(m) == false {
-            return Err("row/column already has value");
-        }
-        if self._check_box(m) == false {
-            return Err("value already exists in box");
-        }
-        */
-
         let updated_cell = Cell {
             previous_value: Some(self._grid[idx as usize]),
             ..*m
         };
         self._grid[idx as usize] = m.value.unwrap_or(0);
         Ok(updated_cell)
-    }
-
-    pub fn print_console(&self) {
-        println!("Puzzle");
-        for i in 0..9 {
-            if i % 3 == 0 {
-                println!("-------------------------");
-            }
-            for j in 0..9 {
-                if j % 3 == 0 {
-                    print!("| ");
-                }
-                let v = self._grid[(i * 9) + j];
-                if v == 0 {
-                    print!(". ");
-                } else {
-                    print!("{} ", v);
-                }
-            }
-            print!("|\n");
-        }
-        println!("-------------------------");
     }
 
     pub fn is_completed(&self) -> bool {
