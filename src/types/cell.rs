@@ -21,6 +21,15 @@ impl Cell {
         }
     }
 
+    pub fn with_value(&self, v: u8) -> Cell {
+        Cell {
+            row: self.row,
+            column: self.column,
+            value: Some(v),
+            previous_value: self.value,
+        }
+    }
+
     pub fn peers(&self) -> Vec<usize> {
         let _self_idx = self.to_grid_idx();
         let mut _mapper: [bool; 81] = [false; 81];
