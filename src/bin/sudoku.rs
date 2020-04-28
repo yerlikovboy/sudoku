@@ -1,6 +1,6 @@
 use std::env;
 
-use sudoku::console::game;
+use sudoku::console::cli;
 use sudoku::console::utils;
 
 fn usage() {
@@ -17,7 +17,7 @@ fn main() {
 
     let file_name = &args[1];
     let mut board = utils::from_file(file_name).unwrap();
-    game::play(&mut board);
+    cli::play(&mut board);
 
     println!("Finished!");
 }
