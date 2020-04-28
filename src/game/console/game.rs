@@ -4,10 +4,10 @@ use std::fmt::Display;
 use std::io;
 use std::io::Read;
 
-use sudoku::Cell;
-use sudoku::Puzzle;
+use crate::game::cell::Cell;
+use crate::game::puzzle::Puzzle;
 
-use crate::console::utils;
+use crate::game::console::utils;
 
 const LINE_FEED: u8 = 10;
 const SPACE: u8 = 32;

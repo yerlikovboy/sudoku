@@ -1,8 +1,7 @@
 use std::env;
 
-mod console;
-use crate::console::game;
-use crate::console::utils;
+use sudoku::game::console;
+use sudoku::game::console::utils;
 
 fn usage() {
     println!("usage: sudoku <filename>\n\twhere filename denotes file with sudoku puzzle.\n\nExample:\n\tsudoku puzzles/easy-board-1.txt");
@@ -18,7 +17,7 @@ fn main() {
 
     let file_name = &args[1];
     let mut board = utils::from_file(file_name).unwrap();
-    game::play(&mut board);
+    console::game::play(&mut board);
 
     println!("Finished!");
 }

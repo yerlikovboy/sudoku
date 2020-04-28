@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::str;
 
-use crate::Cell;
+use crate::game::cell::Cell;
 
 // lessons learned:
 //

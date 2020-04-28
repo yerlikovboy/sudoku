@@ -1,35 +1,13 @@
-use sudoku::types::cell;
-use sudoku::types::puzzle;
-
-pub fn print_console(p: &puzzle::Puzzle) {
-    let _grid = p.grid_as_ref();
-    println!("Puzzle");
-    for i in 0..9 {
-        if i % 3 == 0 {
-            println!("-------------------------");
-        }
-        for j in 0..9 {
-            if j % 3 == 0 {
-                print!("| ");
-            }
-            let v = _grid[(i * 9) + j];
-            if v == 0 {
-                print!(". ");
-            } else {
-                print!("{} ", v);
-            }
-        }
-        print!("|\n");
-    }
-    println!("-------------------------");
-}
+use sudoku::game::cell;
+use sudoku::game::console::utils;
+use sudoku::game::puzzle;
 
 fn dump(c: &cell::Cell) {
     println!("cell: {}", c);
     let mut v: [u8; 81] = [0; 81];
     c.peers().iter().for_each(|x| v[*x as usize] = 1);
     let p = puzzle::Puzzle::new(&v[..]);
-    print_console(&p);
+    utils::print_console(&p);
 }
 
 fn main() {

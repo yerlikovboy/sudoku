@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::Read;
 
-use sudoku::Cell;
-use sudoku::Puzzle;
+use crate::game::cell::Cell;
+use crate::game::puzzle::Puzzle;
 
 pub fn print_console(p: &Puzzle) {
     let _grid = p.grid_as_ref();
