@@ -2,3 +2,5 @@
 pub mod game;
 pub use crate::game::cell::Cell;
 pub use crate::game::puzzle::Puzzle;
+
+pub mod console;

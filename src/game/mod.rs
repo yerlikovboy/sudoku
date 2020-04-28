@@ -2,5 +2,3 @@
 // everyone else who needs to access these can get to them via lib.rc. See lib.rc for how its done.
 pub mod cell;
 pub mod puzzle;
-
-pub mod console;

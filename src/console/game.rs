@@ -7,7 +7,7 @@ use std::io::Read;
 use crate::game::cell::Cell;
 use crate::game::puzzle::Puzzle;
 
-use crate::game::console::utils;
+use crate::console::utils;
 
 const LINE_FEED: u8 = 10;
 const SPACE: u8 = 32;

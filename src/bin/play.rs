@@ -1,5 +1,5 @@
+use sudoku::console::utils;
 use sudoku::game::cell;
-use sudoku::game::console::utils;
 use sudoku::game::puzzle;
 
 fn dump(c: &cell::Cell) {
