@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Read;
 
-use crate::game::cell::Cell;
+use crate::game::actions::Move;
 use crate::game::puzzle::Puzzle;
 
 pub fn print_puzzle(p: &Puzzle) {
@@ -46,7 +46,7 @@ pub fn from_file(file_name: &str) -> std::io::Result<Puzzle> {
     Ok(Puzzle::new(grid.as_slice()))
 }
 
-pub fn user_move(row: u8, column: u8, value: u8) -> Result<Cell, String> {
+pub fn user_move(row: usize, column: usize, value: u8) -> Result<Move, String> {
     if row < 1 || row > 9 {
         return Err(String::from("row must be in the range 1..9"));
     }
@@ -58,10 +58,5 @@ pub fn user_move(row: u8, column: u8, value: u8) -> Result<Cell, String> {
         return Err(String::from("new value must be between 0 and 9"));
     }
 
-    Ok(Cell {
-        row: row - 1,
-        column: column - 1,
-        value: if value == 0 { None } else { Some(value) },
-        previous_value: None,
-    })
+    Ok(Move::new(0, row - 1, column - 1, value))
 }
