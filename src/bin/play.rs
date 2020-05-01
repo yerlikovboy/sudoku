@@ -7,7 +7,7 @@ fn dump(c: &cell::Cell) {
     let mut v: [u8; 81] = [0; 81];
     c.peers().iter().for_each(|x| v[*x as usize] = 1);
     let p = puzzle::Puzzle::new(&v[..]);
-    utils::print_console(&p);
+    utils::print_puzzle(&p);
 }
 
 fn main() {

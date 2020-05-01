@@ -4,18 +4,23 @@ use std::io::Read;
 use crate::game::cell::Cell;
 use crate::game::puzzle::Puzzle;
 
-pub fn print_console(p: &Puzzle) {
-    let _grid = p.grid_as_ref();
+pub fn print_puzzle(p: &Puzzle) {
+    print_console(p.grid_as_ref(), 9, 9);
+}
+
+pub fn print_console(grid: &[u8], row_dim: usize, col_dim: usize) {
     println!("Puzzle");
-    for i in 0..9 {
-        if i % 3 == 0 {
+    for r in 0..row_dim {
+        // TODO: the three needs to be derived from dimension info.
+        if r % 3 == 0 {
             println!("-------------------------");
         }
-        for j in 0..9 {
-            if j % 3 == 0 {
+        for c in 0..col_dim {
+            // TODO: the three needs to be derived from dimension info.
+            if c % 3 == 0 {
                 print!("| ");
             }
-            let v = _grid[(i * 9) + j];
+            let v = grid[(r * row_dim) + c];
             if v == 0 {
                 print!(". ");
             } else {
