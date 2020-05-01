@@ -123,7 +123,7 @@ fn get_request() -> UserRequest {
 
 pub fn play(puzzle: &mut Puzzle) {
     loop {
-        utils::print_console(puzzle);
+        utils::print_puzzle(puzzle);
         println!("Please enter your next move (row column value) or Ctrl-C to quit: ");
 
         match get_request() {
