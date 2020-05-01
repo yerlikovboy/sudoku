@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::str;
 
-use crate::game::cell::Cell;
+use crate::game::actions::{Move, Update};
 
 // lessons learned:
 //
@@ -63,20 +63,18 @@ impl Puzzle {
         &self._grid
     }
 
-    fn check_peers(&self, c: &Cell) -> bool {
-        if !c.value.is_none() {
-            for idx in c.peers() {
-                if self._grid[idx] == c.value.unwrap() {
-                    return true;
-                }
+    fn check_peers(&self, m: &Move) -> bool {
+        let peers = m.cell().peers();
+        for idx in peers {
+            if self._grid[idx] == m.value() {
+                return true;
             }
         }
         false
     }
 
-    pub fn update_cell(&mut self, m: &Cell) -> Result<Cell, &str> {
-        let idx = m.to_grid_idx();
-        if self._clues_indices.contains(&idx) {
+    pub fn update_cell(&mut self, m: &Move) -> Result<Update, &str> {
+        if self._clues_indices.contains(&m.idx()) {
             return Err("cannot update initial board value");
         }
 
@@ -84,12 +82,15 @@ impl Puzzle {
             return Err("cell has a peer which already contains value");
         }
 
-        let updated_cell = Cell {
-            previous_value: Some(self._grid[idx as usize]),
-            ..*m
+        let u = Update {
+            num: 0,
+            idx: m.idx(),
+            new_value: m.value(),
+            prev_value: self._grid[m.idx()],
         };
-        self._grid[idx as usize] = m.value.unwrap_or(0);
-        Ok(updated_cell)
+
+        self._grid[m.idx()] = m.value();
+        Ok(u)
     }
 
     pub fn is_completed(&self) -> bool {

@@ -4,7 +4,7 @@ use std::fmt::Display;
 use std::io;
 use std::io::Read;
 
-use crate::game::cell::Cell;
+use crate::game::actions::Move;
 use crate::game::puzzle::Puzzle;
 
 use crate::console::utils;
@@ -31,7 +31,7 @@ impl Display for ByteType {
 }
 
 enum UserRequest {
-    Move(Cell),
+    Move(Move),
     UndoMove,
     Help,
     Quit,
@@ -41,7 +41,7 @@ enum UserRequest {
 impl Display for UserRequest {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let retval = match self {
-            UserRequest::Move(c) => f.write_fmt(format_args!("Move: [{}]", c)),
+            UserRequest::Move(m) => f.write_fmt(format_args!("Move: [{}]", m)),
             UserRequest::UndoMove => f.write_str("undo last move"),
             UserRequest::Help => f.write_str("display help"),
             UserRequest::Quit => f.write_str("quit"),
@@ -111,7 +111,7 @@ fn get_request() -> UserRequest {
                     };
                     if vals.len() == 3 {
                         return UserRequest::Move(
-                            utils::user_move(vals[0], vals[1], vals[2]).unwrap(),
+                            utils::user_move(vals[0] as usize, vals[1] as usize, vals[2]).unwrap(),
                         );
                     }
                     prev = ByteType::DIGIT;
