@@ -6,18 +6,15 @@ use crate::game::puzzle::Puzzle;
 
 pub fn print_puzzle(p: &Puzzle) {
     print_puzzle_cells(p.grid());
-    //print_console(p.grid_as_ref(), 9, 9);
 }
 
 pub fn print_puzzle_cells(p: &[Cell]) {
     println!("Puzzle: Cells");
     for r in 0..9 {
-        // TODO: the three needs to be derived from dimension info.
         if r % 3 == 0 {
             println!("-------------------------");
         }
         for c in 0..9 {
-            // TODO: the three needs to be derived from dimension info.
             if c % 3 == 0 {
                 print!("| ");
             }
@@ -27,14 +24,11 @@ pub fn print_puzzle_cells(p: &[Cell]) {
                 print!(". ");
             } else {
                 let n = v.unwrap();
-                print!("\x1B[38;5;221m{}\x1B[0m ", n);
-                /*
-                if cell.is_clue() {
-                    print!("\x1B[38;5;221m{}\x1B[0m ", n);
+                if cell.has_conflicts() {
+                    print!("\x1B[38;5;160m{}\x1B[0m ", n);
                 } else {
-                    print!("\x1B[38;5;165m{}\x1B[0m ", n);
+                    print!("\x1B[38;5;221m{}\x1B[0m ", n);
                 }
-                */
             }
         }
         print!("|\n");
