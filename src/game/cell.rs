@@ -7,6 +7,7 @@ pub struct Cell {
     pub idx: usize,
     value: Option<u8>,
     is_clue: bool,
+    conflicts: u8,
 }
 
 #[inline]
@@ -52,6 +53,7 @@ impl Cell {
             column: col_from_idx(idx),
             value: if value == 0 { None } else { Some(value) },
             is_clue: false,
+            conflicts: 0,
         }
     }
 
@@ -62,6 +64,7 @@ impl Cell {
             idx: to_grid_idx(row, column),
             value,
             is_clue: false,
+            conflicts: 0,
         }
     }
 
@@ -72,6 +75,7 @@ impl Cell {
             idx,
             value: Some(value),
             is_clue: true,
+            conflicts: 0,
         }
     }
 
@@ -80,8 +84,34 @@ impl Cell {
             row: idx / 9,
             column: idx % 9,
             idx,
-            ..Default::default()
+            value: None,
+            is_clue: false,
+            conflicts: 0,
         }
+    }
+
+    pub fn has_conflicts(&self) -> bool {
+        self.conflicts != 0
+    }
+
+    pub fn incr_conflict(&mut self) {
+        self.conflicts += 1;
+    }
+
+    pub fn conflict_down(&mut self) {
+        self.conflicts -= 1;
+    }
+
+    pub fn set_conflicts(&mut self, c: u8) {
+        self.conflicts = c;
+    }
+
+    pub fn clear_conflicts(&mut self) {
+        self.conflicts = 0;
+    }
+
+    pub fn set_value(&mut self, value: u8) {
+        self.value = if value == 0 { None } else { Some(value) }
     }
 
     pub fn peers(&self) -> Vec<usize> {

@@ -68,6 +68,7 @@ impl Puzzle {
         self.grid.as_slice()
     }
 
+    /*
     fn check_peers(&self, m: &Cell) -> bool {
         let peers = m.peers();
         for idx in peers {
@@ -77,17 +78,37 @@ impl Puzzle {
         }
         false
     }
+    */
 
     pub fn update_cell(&mut self, m: &Cell) -> Result<(), &str> {
-        let curr = &self.grid[m.idx()];
+        let current_value = self.grid[m.idx()].value().unwrap_or(0);
+        let new_value = m.value().unwrap_or(0);
+
+        if current_value == new_value {
+            return Ok(());
+        }
+        let mut conflict_count: u8 = 0;
+
+        for peer_idx in m.peers() {
+            let peer = &mut self.grid[peer_idx];
+            let peer_value = peer.value().unwrap_or(0);
+
+            if current_value != 0 && peer_value == current_value {
+                peer.conflict_down();
+            }
+            if new_value != 0 && peer_value == new_value {
+                peer.incr_conflict();
+                conflict_count += 1;
+            }
+        }
+
+        let curr = &mut self.grid[m.idx()];
         if curr.is_clue() {
             return Err("cannot update initial board value");
         }
-        if !m.value().is_none() && self.check_peers(m) {
-            return Err("cell has a peer which already contains value");
-        }
+        curr.set_value(new_value);
+        curr.set_conflicts(conflict_count);
 
-        self.grid[m.idx()] = (*m).clone();
         Ok(())
     }
 
