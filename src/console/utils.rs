@@ -1,11 +1,45 @@
 use std::fs::File;
 use std::io::Read;
 
+use crate::game::cell::Cell;
 use crate::game::puzzle::Puzzle;
-use crate::game::update::Request;
 
 pub fn print_puzzle(p: &Puzzle) {
-    print_console(p.grid_as_ref(), 9, 9);
+    print_puzzle_cells(p.grid());
+    //print_console(p.grid_as_ref(), 9, 9);
+}
+
+pub fn print_puzzle_cells(p: &[Cell]) {
+    println!("Puzzle: Cells");
+    for r in 0..9 {
+        // TODO: the three needs to be derived from dimension info.
+        if r % 3 == 0 {
+            println!("-------------------------");
+        }
+        for c in 0..9 {
+            // TODO: the three needs to be derived from dimension info.
+            if c % 3 == 0 {
+                print!("| ");
+            }
+            let cell = &p[(r * 9) + c];
+            let v = cell.value();
+            if v.is_none() {
+                print!(". ");
+            } else {
+                let n = v.unwrap();
+                print!("\x1B[38;5;221m{}\x1B[0m ", n);
+                /*
+                if cell.is_clue() {
+                    print!("\x1B[38;5;221m{}\x1B[0m ", n);
+                } else {
+                    print!("\x1B[38;5;165m{}\x1B[0m ", n);
+                }
+                */
+            }
+        }
+        print!("|\n");
+    }
+    println!("-------------------------");
 }
 
 pub fn print_console(grid: &[u8], row_dim: usize, col_dim: usize) {
@@ -46,7 +80,7 @@ pub fn from_file(file_name: &str) -> std::io::Result<Puzzle> {
     Ok(Puzzle::new(grid.as_slice()))
 }
 
-pub fn user_move(row: usize, column: usize, value: u8) -> Result<Request, String> {
+pub fn user_move(row: usize, column: usize, value: u8) -> Result<Cell, String> {
     if row < 1 || row > 9 {
         return Err(String::from("row must be in the range 1..9"));
     }
@@ -58,5 +92,9 @@ pub fn user_move(row: usize, column: usize, value: u8) -> Result<Request, String
         return Err(String::from("new value must be between 0 and 9"));
     }
 
-    Ok(Request::new(row - 1, column - 1, value))
+    Ok(Cell::user_request(
+        row - 1,
+        column - 1,
+        if value == 0 { None } else { Some(value) },
+    ))
 }

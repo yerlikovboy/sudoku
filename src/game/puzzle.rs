@@ -1,8 +1,3 @@
-use std::collections::HashSet;
-use std::str;
-
-use crate::game::update::{Request, Response};
-
 // lessons learned:
 //
 // numeric values have to be converted to usize if they are to be used
@@ -43,63 +38,60 @@ use crate::game::update::{Request, Response};
 // }
 // Again, no way to resolve the lifespan of &str from this.
 
+use std::str;
+
+use crate::game::cell::Cell;
+
 // classic 9x9 sudoku
 pub struct Puzzle {
-    _grid: Vec<u8>,
-    _clues_indices: HashSet<usize>,
+    grid: Vec<Cell>,
 }
 
 impl Puzzle {
     pub fn new(grid: &[u8]) -> Puzzle {
-        Puzzle {
-            _grid: grid.to_vec(),
-            _clues_indices: (0..81)
-                .filter(|x| grid[*x as usize] != 0)
-                .collect::<HashSet<usize>>(),
+        let mut v: Vec<Cell> = Vec::with_capacity(81);
+
+        for i in 0..81 {
+            let clue = grid[i];
+            if clue == 0 {
+                v.push(Cell::new(i, clue));
+            } else {
+                v.push(Cell::new_clue(i, grid[i]));
+            }
         }
+
+        Puzzle { grid: v }
     }
 
-    pub fn grid_as_ref(&self) -> &[u8] {
-        &self._grid
+    #[inline]
+    pub fn grid(&self) -> &[Cell] {
+        self.grid.as_slice()
     }
 
-    fn check_peers(&self, m: &Request) -> bool {
-        let peers = m.cell().peers();
+    fn check_peers(&self, m: &Cell) -> bool {
+        let peers = m.peers();
         for idx in peers {
-            if self._grid[idx] == m.value() {
+            if self.grid[idx].value() == m.value() {
                 return true;
             }
         }
         false
     }
 
-    pub fn update_cell(&mut self, m: &Request) -> Result<Response, &str> {
-        if self._clues_indices.contains(&m.idx()) {
+    pub fn update_cell(&mut self, m: &Cell) -> Result<(), &str> {
+        let curr = &self.grid[m.idx()];
+        if curr.is_clue() {
             return Err("cannot update initial board value");
         }
-
-        if m.value() != 0 && self.check_peers(m) {
+        if !m.value().is_none() && self.check_peers(m) {
             return Err("cell has a peer which already contains value");
         }
 
-        let u: Response = Response {
-            id: 0,
-            idx: m.idx(),
-            req_id: m.id(),
-            new_value: m.value(),
-            prev_value: self._grid[m.idx()],
-        };
-
-        self._grid[m.idx()] = m.value();
-        Ok(u)
+        self.grid[m.idx()] = (*m).clone();
+        Ok(())
     }
 
     pub fn is_completed(&self) -> bool {
-        for i in 0..81 {
-            if self._grid[i] == 0 {
-                return false;
-            }
-        }
-        true
+        self.grid.iter().all(|x| !x.value().is_none())
     }
 }
