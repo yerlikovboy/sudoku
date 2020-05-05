@@ -1,20 +1,77 @@
 use std::fmt;
 
-use crate::game::puzzle::Puzzle;
-
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Cell {
     pub row: usize,
     pub column: usize,
     pub idx: usize,
+    value: Option<u8>,
+    is_clue: bool,
+}
+
+#[inline]
+fn row_from_idx(idx: usize) -> usize {
+    idx / 9
+}
+
+#[inline]
+fn col_from_idx(idx: usize) -> usize {
+    idx % 9
+}
+
+#[inline]
+fn to_grid_idx(row: usize, column: usize) -> usize {
+    (row * 9) + column
 }
 
 impl Cell {
-    pub fn new(row: usize, column: usize) -> Cell {
+    #[inline]
+    pub fn idx(&self) -> usize {
+        self.idx
+    }
+
+    #[inline]
+    pub fn value(&self) -> Option<u8> {
+        self.value
+    }
+
+    #[inline]
+    pub fn is_clue(&self) -> bool {
+        self.is_clue
+    }
+
+    #[inline]
+    pub fn as_grid_idx(&self) -> usize {
+        self.idx
+    }
+
+    pub fn new(idx: usize, value: u8) -> Cell {
+        Cell {
+            idx,
+            row: row_from_idx(idx),
+            column: col_from_idx(idx),
+            value: if value == 0 { None } else { Some(value) },
+            is_clue: false,
+        }
+    }
+
+    pub fn user_request(row: usize, column: usize, value: Option<u8>) -> Cell {
         Cell {
             row,
             column,
-            idx: Cell::to_grid_idx(row, column),
+            idx: to_grid_idx(row, column),
+            value,
+            is_clue: false,
+        }
+    }
+
+    pub fn new_clue(idx: usize, value: u8) -> Cell {
+        Cell {
+            row: row_from_idx(idx),
+            column: col_from_idx(idx),
+            idx,
+            value: Some(value),
+            is_clue: true,
         }
     }
 
@@ -23,25 +80,8 @@ impl Cell {
             row: idx / 9,
             column: idx % 9,
             idx,
+            ..Default::default()
         }
-    }
-
-    #[inline]
-    pub fn to_grid_idx(row: usize, column: usize) -> usize {
-        (row * 9) + column
-    }
-
-    #[inline]
-    pub fn as_grid_idx(&self) -> usize {
-        self.idx
-    }
-
-    pub fn value(&self, p: &Puzzle) -> Option<u8> {
-        let v = p.grid_as_ref()[self.as_grid_idx()];
-        if v != 0 {
-            return Some(v);
-        }
-        None
     }
 
     pub fn peers(&self) -> Vec<usize> {
