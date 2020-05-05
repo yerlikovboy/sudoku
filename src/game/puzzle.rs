@@ -92,6 +92,6 @@ impl Puzzle {
     }
 
     pub fn is_completed(&self) -> bool {
-        self.grid.iter().all(|x| !x.value().is_none())
+        self.grid.iter().all(|x| x.value().is_some())
     }
 }
