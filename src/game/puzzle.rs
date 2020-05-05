@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::str;
 
-use crate::game::actions::{Move, Update};
+use crate::game::update::{Request, Response};
 
 // lessons learned:
 //
@@ -63,7 +63,7 @@ impl Puzzle {
         &self._grid
     }
 
-    fn check_peers(&self, m: &Move) -> bool {
+    fn check_peers(&self, m: &Request) -> bool {
         let peers = m.cell().peers();
         for idx in peers {
             if self._grid[idx] == m.value() {
@@ -73,18 +73,19 @@ impl Puzzle {
         false
     }
 
-    pub fn update_cell(&mut self, m: &Move) -> Result<Update, &str> {
+    pub fn update_cell(&mut self, m: &Request) -> Result<Response, &str> {
         if self._clues_indices.contains(&m.idx()) {
             return Err("cannot update initial board value");
         }
 
-        if self.check_peers(m) {
+        if m.value() != 0 && self.check_peers(m) {
             return Err("cell has a peer which already contains value");
         }
 
-        let u = Update {
-            num: 0,
+        let u: Response = Response {
+            id: 0,
             idx: m.idx(),
+            req_id: m.id(),
             new_value: m.value(),
             prev_value: self._grid[m.idx()],
         };

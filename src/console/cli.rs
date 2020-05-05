@@ -4,8 +4,8 @@ use std::fmt::Display;
 use std::io;
 use std::io::Read;
 
-use crate::game::actions::Move;
 use crate::game::puzzle::Puzzle;
+use crate::game::update;
 
 use crate::console::utils;
 
@@ -31,7 +31,7 @@ impl Display for ByteType {
 }
 
 enum UserRequest {
-    Move(Move),
+    Move(update::Request),
     UndoMove,
     Help,
     Quit,
@@ -122,16 +122,42 @@ fn get_request() -> UserRequest {
 }
 
 pub fn play(puzzle: &mut Puzzle) {
+    let mut user_reqs: Vec<update::Request> = Vec::new();
+    let mut updates: Vec<update::Response> = Vec::new();
+
     loop {
         utils::print_puzzle(puzzle);
         println!("Please enter your next move (row column value) or Ctrl-C to quit: ");
 
         match get_request() {
-            UserRequest::Move(c) => match puzzle.update_cell(&c) {
-                Ok(update) => println!("update: {}", update),
-                Err(msg) => println!("unable to make move {} -> {} ", c, msg),
-            },
-            UserRequest::UndoMove => println!("TODO: implement undo"),
+            UserRequest::Move(c) => {
+                match puzzle.update_cell(&c) {
+                    Ok(update) => {
+                        println!("update: {}", update);
+                        updates.push(update);
+                    }
+                    Err(msg) => println!("unable to make move {} -> {} ", c, msg),
+                }
+                user_reqs.push(c);
+            }
+            UserRequest::UndoMove => {
+                //TODO: lots of cleanup here...
+                let last_update = updates.pop();
+                if last_update.is_none() {
+                    println!("nothing to undo");
+                } else {
+                    let lu = last_update.unwrap();
+                    println!("undoing last update: {}", lu);
+                    match puzzle.update_cell(&lu.undo_request()) {
+                        Ok(upd) => {
+                            println!("undo status: {}", upd);
+                            //updates.push(upd);
+                        }
+                        Err(msg) => println!("unable to undo {} -> {}", lu, msg),
+                    }
+                }
+            }
+
             UserRequest::Help => println!("TODO: implement help."),
             UserRequest::Quit => break,
             _ => (), // ignore the rest
