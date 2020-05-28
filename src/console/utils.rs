@@ -26,6 +26,8 @@ pub fn print_puzzle_cells(p: &[Cell]) {
                 let n = v.unwrap();
                 if cell.has_conflicts() {
                     print!("\x1B[38;5;160m{}\x1B[0m ", n);
+                } else if cell.is_clue() {
+                    print!("\x1B[38;5;111m{}\x1B[0m ", n);
                 } else {
                     print!("\x1B[38;5;221m{}\x1B[0m ", n);
                 }

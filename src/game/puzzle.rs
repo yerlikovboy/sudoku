@@ -68,18 +68,6 @@ impl Puzzle {
         self.grid.as_slice()
     }
 
-    /*
-    fn check_peers(&self, m: &Cell) -> bool {
-        let peers = m.peers();
-        for idx in peers {
-            if self.grid[idx].value() == m.value() {
-                return true;
-            }
-        }
-        false
-    }
-    */
-
     pub fn update_cell(&mut self, m: &Cell) -> Result<(), &str> {
         let current_value = self.grid[m.idx()].value().unwrap_or(0);
         let new_value = m.value().unwrap_or(0);

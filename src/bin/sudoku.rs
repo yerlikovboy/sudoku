@@ -18,6 +18,4 @@ fn main() {
     let file_name = &args[1];
     let mut board = utils::from_file(file_name).unwrap();
     cli::play(&mut board);
-
-    println!("Finished!");
 }

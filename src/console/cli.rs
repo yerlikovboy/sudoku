@@ -124,11 +124,11 @@ fn get_request() -> UserRequest {
 pub fn play(puzzle: &mut Puzzle) {
     loop {
         utils::print_puzzle(puzzle);
-        println!("Please enter your next move (row column value) or Ctrl-C to quit: ");
+        println!("Please enter your next move (row column value): ");
 
         match get_request() {
             UserRequest::Move(c) => match puzzle.update_cell(&c) {
-                Ok(_) => println!("update ok "),
+                Ok(_) => (),
                 Err(msg) => println!("unable to make move {} -> {} ", c, msg),
             },
             UserRequest::UndoMove => println!("TODO: implement maybe?"),
@@ -139,6 +139,7 @@ pub fn play(puzzle: &mut Puzzle) {
 
         if puzzle.is_completed() {
             println!("Congrats! You've won!");
+            utils::print_puzzle(puzzle);
             break;
         }
     }
