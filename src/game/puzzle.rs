@@ -69,6 +69,10 @@ impl Puzzle {
     }
 
     pub fn update_cell(&mut self, m: &Cell) -> Result<(), &str> {
+        if self.grid[m.idx()].is_clue() {
+            return Err("cell holds clue value");
+        }
+
         let current_value = self.grid[m.idx()].value().unwrap_or(0);
         let new_value = m.value().unwrap_or(0);
 
@@ -90,10 +94,10 @@ impl Puzzle {
             }
         }
 
+        // why is this down here and not above? Because the line where the peer cell
+        // is referenced requires a mutable reference from the same vector as where
+        // curr resides.
         let curr = &mut self.grid[m.idx()];
-        if curr.is_clue() {
-            return Err("cannot update initial board value");
-        }
         curr.set_value(new_value);
         curr.set_conflicts(conflict_count);
 
